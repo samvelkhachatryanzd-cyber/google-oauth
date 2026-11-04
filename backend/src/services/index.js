@@ -27,14 +27,13 @@ async function registerService({ username, email, password }) {
 
   try {
     const normalizedEmail = email.replace(/[^a-zA-Z0-9]/g, "");
-    console.log(normalizedEmail);
     const existingUser = await User.findOne({ where: { email: normalizedEmail } })
 
     if (existingUser) {
       throw new HttpError(409, 'An account with this email already exists');
     }
 
-    const user = await User.create({ username, email, password: hashedPassword });
+    const user = await User.create({ username, email: normalizedEmail, password: hashedPassword });
     return toPublicUser(user);
   } catch (error) {
     // email is the only unique column. Relying on the database constraint (instead of

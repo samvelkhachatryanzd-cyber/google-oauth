@@ -46,7 +46,8 @@ async function registerService({ username, email, password }) {
 }
 
 async function loginService({ email, password }) {
-  const user = await User.findOne({ where: { email } });
+  const normalizedEmail = email.replace(/[^a-zA-Z0-9]/g, "");
+  const user = await User.findOne({ where: { email: normalizedEmail } });
 
   const passwordMatches = await bcrypt.compare(password, user?.password ?? DUMMY_HASH);
   if (!user || !passwordMatches) {
@@ -82,7 +83,8 @@ async function googleLoginService({ credential }) {
   if (user) return toPublicUser(user);
 
   try {
-    user = await User.findOne({ where: { email } });
+    const normalizedEmail = email.replace(/[^a-zA-Z0-9]/g, "");
+    user = await User.findOne({ where: { email: normalizedEmail } });
 
     if (!user) {
       return toPublicUser(await User.create({ username, email, googleId }));
